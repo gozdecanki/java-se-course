@@ -12,7 +12,7 @@ public class Loop_04_ForEach {
         System.out.println(student1+ ' ' + student2 + ' ' +student3 + ' '+ student4);
 
         System.out.println("---------------------------");
-        //   0         1          2        3
+                            //   0         1          2        3        4
         String [] students =  {"Barış", "İbrahim",  "Emre", "Osman", "Ertuğrul"};
         System.out.println(students);
         System.out.println(students[0] + ' ' + students[1]+ ' ' + students[2]+ ' ' + students[3] );

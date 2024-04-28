@@ -1,6 +1,6 @@
 package org.canki;
 
-public class Loop_While_DoWhile {
+public class Loop_03_While_DoWhile {
 
     public static void main(String[] args) {
 
@@ -22,7 +22,7 @@ public class Loop_While_DoWhile {
         System.out.println("---DO WHILE--------------------------");
         int j = 0; // BASLANGIC
 
-        do  { // EN AZ 1 KERE CALISIR
+        do  { // EN AZ 1 KERE CALISIR ---> şart 5<j olarak sağlamayacak ama do kısmı çalışmış olacak.
             System.out.println(j);
             j++;  // ARTIS YA DA AZALTIM MIKTARI
         } while (  5 < j ); // SART
