@@ -1,0 +1,21 @@
+server:
+  port: 8888
+
+spring:
+  cloud:
+    config:
+      server:
+        git:
+          uri: ${REMOTE_CONFIG_PATH_PROJECT}
+          default-label: main
+          username: ${REMOTE_USERNAME}
+          password: ${REMOTE_TOKEN_PASSWORD}
+
+
+#          uri: https://github.com/gozdecanki/config-server-remote-2024.git
+#          default-label: main
+#          username: gozdecanki
+#          password: 123456789
+
+
+

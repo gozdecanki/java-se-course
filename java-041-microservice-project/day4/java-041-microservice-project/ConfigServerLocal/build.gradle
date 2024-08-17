@@ -1,0 +1,6 @@
+
+dependencies {
+	implementation libs.springCloudConfigServer
+	implementation libs.springCloudStarterConfig
+
+}
