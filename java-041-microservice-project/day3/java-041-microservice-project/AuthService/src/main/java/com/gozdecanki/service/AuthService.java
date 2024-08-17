@@ -5,6 +5,7 @@ import com.gozdecanki.dto.request.DoRegisterRequestDto;
 import com.gozdecanki.dto.response.DoRegisterResponseDto;
 import com.gozdecanki.exception.AuthServiceException;
 import com.gozdecanki.exception.ErrorType;
+import com.gozdecanki.manager.IUserProfileManager;
 import com.gozdecanki.mapper.IAuthMapper;
 import com.gozdecanki.model.Auth;
 import com.gozdecanki.repository.IAuthRepository;
@@ -34,14 +35,16 @@ public class AuthService extends ServiceManager<Auth, Long> {
 
     private final JwtTokenManager jwtTokenManager;
 
+    // FeignClient inject
+    private final IUserProfileManager userProfileManager;
 
-    public AuthService(IAuthRepository repository, JwtTokenManager jwtTokenManager) {
+
+    public AuthService(IAuthRepository repository, JwtTokenManager jwtTokenManager, IUserProfileManager userProfileManager) {
         super(repository);
         this.repository = repository;
         this.jwtTokenManager = jwtTokenManager;
+        this.userProfileManager = userProfileManager;
     }
-
-
 
 
     public Auth doRegisterV1(DoRegisterRequestDto dto) {
@@ -78,14 +81,13 @@ public class AuthService extends ServiceManager<Auth, Long> {
         save(auth);
 
 
-
         return auth;
     }
 
 
     public DoRegisterResponseDto doRegister(DoRegisterRequestDto dto) {
 
-        // TODO Parolayı belirli büyük küçük harf ve sayı olmaya zorlamak için REGEX kalıpları kullanılır.
+        // TODO Parolayı belirli büyük küçük harf ve sayı olmaya zormaka için REGEX kalıpları kullanılır.
         /*
         String regExpn = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";
         Pattern pattern = Pattern.compile(regExpn, Pattern.CASE_INSENSITIVE);
@@ -134,24 +136,40 @@ public class AuthService extends ServiceManager<Auth, Long> {
         }
 
 
+/*
+        Auth auth = save(
+                Auth.builder()
+                    .username(dto.getUsername())
+                    .email(dto.getEmail())
+                    .password(dto.getPassword())
+                    .state(true)
+                    .createAt(System.currentTimeMillis())
+                    .build()
+        );
+*/
 
-//        Auth auth = save(
-//                Auth.builder()
-//                        .username(dto.getUsername())
-//                        .email(dto.getEmail())
-//                        .password(dto.getPassword())
-//                        .state(true)
-//                        .createAt(System.currentTimeMillis())
-//                        .build()
-//        );
+        Auth auth = IAuthMapper.INSTANCE.toAuth(dto);
 
-        Auth auth= IAuthMapper.INSTANCE.doRegisterRequestDtoToAuth(dto);
+        auth.setCreateAt(System.currentTimeMillis());
+        auth.setState(true);
 
-        //BaseEntity sınıfında @CreatedDate  annotationı  kullanıldığı için  gerek kalmadı
-//        auth.setCreateAt(System.currentTimeMillis());
-//        auth.setState(true);
         save(auth);
-        System.out.println("auth: "+ auth);
+
+        System.out.println("auth: " + auth);
+
+     /*
+        UserProfileSaveRequestDto saveDto = new UserProfileSaveRequestDto();
+        saveDto.setAuthId(auth.getId());
+        saveDto.setUsername(auth.getUsername());
+        saveDto.setEmail(auth.getEmail());
+
+        userProfileManager.save(saveDto);
+        */
+
+        // UserProfile servisindeki save metodunu çagırıyoruz.
+        // http://localhost:9091/user/save
+
+        userProfileManager.save(IAuthMapper.INSTANCE.fromAuth(auth));
 
 
         DoRegisterResponseDto responseDto = new DoRegisterResponseDto();
@@ -163,14 +181,11 @@ public class AuthService extends ServiceManager<Auth, Long> {
     }
 
 
-
-
-
     public String doLoginV1(DoLoginRequestDto dto) {
 
         Optional<Auth> auth = repository.findByUsernameAndPassword(dto.getUsername(), dto.getPassword());
 
-        if(auth.isEmpty()) {
+        if (auth.isEmpty()) {
             throw new AuthServiceException(ErrorType.DOLOGIN_USERNAME_OR_PASSWORD_MISMATCH);
         }
 
@@ -180,14 +195,12 @@ public class AuthService extends ServiceManager<Auth, Long> {
     }
 
 
-
     public String doLogin(DoLoginRequestDto dto) {
 
         Optional<Auth> auth = repository.findByUsernameAndPassword(dto.getUsername(), dto.getPassword());
 
 
-
-        if(auth.isEmpty()) {
+        if (auth.isEmpty()) {
             throw new AuthServiceException(ErrorType.DOLOGIN_USERNAME_OR_PASSWORD_MISMATCH);
         }
 
@@ -199,16 +212,14 @@ public class AuthService extends ServiceManager<Auth, Long> {
     }
 
 
-
-
-    public List<Auth> findAll(String token){
+    public List<Auth> findAll(String token) {
 
         Optional<Long> id = null;
 
         try {
             id = jwtTokenManager.getIdInfoFromToken(token);
 
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new AuthServiceException(ErrorType.INVALID_TOKEN);
         }
 
@@ -217,11 +228,6 @@ public class AuthService extends ServiceManager<Auth, Long> {
 
         return repository.findAll();
     }
-
-
-
-
-
 
 
 }

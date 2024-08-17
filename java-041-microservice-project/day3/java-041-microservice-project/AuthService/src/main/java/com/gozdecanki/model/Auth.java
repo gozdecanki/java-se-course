@@ -8,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 //@EqualsAndHashCode(callSuper = true)
 
 
+@EqualsAndHashCode(callSuper = true)
 @SuperBuilder // bir siniftan nesne türetmek için kullanilir
 @Data // set ve get metodlarini otomatik tanimlar
 @NoArgsConstructor // bos paramtereli hazırlayıcı yapıcı metodu oluşturur.
@@ -32,5 +33,7 @@ public class Auth extends BaseEntity{
     private String email;
 
     private String password;
+
+    private String address;
 
 }

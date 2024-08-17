@@ -50,6 +50,8 @@ public class AuthController {
 */
 
 
+    //  http://localhost:9090/auth/register
+
     @PostMapping(ENDPOINT_REGISTER)
     public ResponseEntity<DoRegisterResponseDto> register (@RequestBody DoRegisterRequestDto dto) {
         System.out.println("Register request DTO: " + dto);
@@ -80,4 +82,11 @@ public class AuthController {
     @GetMapping(ENDPOINT_GETMESSAGE)
     public  String   getMessage () {
         return null; }
+
+
+
+
+
+
+
 }
